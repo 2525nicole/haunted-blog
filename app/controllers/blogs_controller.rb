@@ -57,7 +57,11 @@ end
   end
 
   def blog_params
-    params.require(:blog).permit(:title, :content, :secret, :random_eyecatch)
+    permitted_columns = [:title, :content, :secret]
+    if current_user[:premium]
+      permitted_columns << :random_eyecatch
+    end
+    params.require(:blog).permit(permitted_columns)
   end
 
   def find_own_blog
