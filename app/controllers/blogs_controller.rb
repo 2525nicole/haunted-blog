@@ -45,22 +45,20 @@ class BlogsController < ApplicationController
   private
 
   def set_blog
-    if user_signed_in?
-      @blog = Blog.published.find_by(id: params[:id]) || find_own_blog
-    else
-      @blog = Blog.published.find(params[:id])
+    @blog = if user_signed_in?
+              Blog.published.find_by(id: params[:id]) || find_own_blog
+            else
+              Blog.published.find(params[:id])
+            end
   end
-end
 
   def set_own_blog
     @blog = find_own_blog
   end
 
   def blog_params
-    permitted_columns = [:title, :content, :secret]
-    if current_user[:premium]
-      permitted_columns << :random_eyecatch
-    end
+    permitted_columns = %i[title content secret]
+    current_user[:premium] && permitted_columns << :random_eyecatch
     params.require(:blog).permit(permitted_columns)
   end
 
